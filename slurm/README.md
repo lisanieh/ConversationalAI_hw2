@@ -23,6 +23,24 @@ conda activate ~/scratch/conda/envs/CAI_A2
 Rule of thumb on PACE-ICE: **home holds code; scratch holds environments, model caches,
 and checkpoints.** `pace-quota` shows your current usage.
 
+## Model weights: use the shared course cache (recommended)
+
+The course keeps a ready-to-use copy of all three Llama checkpoints
+(`Llama-3.2-1B-Instruct`, `Llama-3.2-3B-Instruct`, `Llama-3.1-8B-Instruct`) in a shared,
+read-only location on PACE-ICE, so **you do not need your own Hugging Face access or token.**
+Point `HF_HOME` at the shared cache and run fully offline. Instead of the
+`HF_HOME=~/scratch/hf_cache` line above, put this in your `~/.bashrc`:
+
+```bash
+export HF_HOME=/storage/ice1/0/4/lheck6/CS6604_ECE6256/hf_cache   # Course-provided Llama weights (read-only).
+export HF_HUB_OFFLINE=1              # Read only from local cache; never contact Hub.
+export TRANSFORMERS_OFFLINE=1        # Same for older transformers.
+```
+
+Offline mode is what makes this reliable: with the weights already cached, the loaders
+resolve `meta-llama/...` straight from disk and never hit Hugging Face's gating check.
+Everything else the pipeline needs (your adapters, your preference data, your dev eval sets)
+is already local, so nothing else has to be downloaded.
 
 ## Pipeline order
 
@@ -60,7 +78,8 @@ job's own GPU — it co-resides with your policy, costs nothing, and its judgmen
 cached to `output/judge_cache.json` so re-runs reproduce. The first eval run downloads
 the judge model to your Hugging Face cache.
 
-**Gated models — authenticate once.** The Llama base and judge checkpoints are gated on
-Hugging Face. Accept each model's license on its HF page, then run `huggingface-cli login`
-(or set `HF_TOKEN` in `~/.bashrc`) before your first training/eval job, or the download 401s
-on the compute node.
+**Fetching the models yourself (only if you are NOT using the shared cache).** The Llama base
+and judge checkpoints are gated on Hugging Face. Accept each model's license on its HF page
+(usually quick, but Meta's review can take anywhere from minutes to a few days -- request
+early), then run `huggingface-cli login` (or set `HF_TOKEN` in `~/.bashrc`) before your first
+job, or the download 401s on the compute node. With the shared course cache above you need none of this.
