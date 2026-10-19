@@ -108,55 +108,64 @@ def synthesize_pairs(n: int) -> list[dict]:
                 response_fields = ("clarify", "guess")
                 task = (f"""
                     Generate genuinely ambiguous user requests.
-                    A request is ambiguous only when important missing information could materially
-                    change the response. Do not use questions that have a straightforward, useful
-                    general answer, or questions that can be answered by stating a reasonable caveat.
 
-                    For each request, provide:
-                    - "prompt": the user's request.
-                    - "clarify": one specific question asking for the missing information needed
-                    before giving a tailored answer.
-                    - "guess": a plausible response that commits to one unstated interpretation.
-                    Make the assumption apparent; do not invent current or time-sensitive facts.
+                    A request is ambiguous only when an important missing detail would materially
+                    change a useful, tailored response. Do not label a request ambiguous just because
+                    the assistant could ask an optional follow-up question.
 
-                    Do not make the prompt ambiguous merely because an unneeded detail could be asked.
+                    For each object:
+                    - "prompt": a realistic user request with important information omitted.
+                    - "clarify": one concise, specific question asking for the missing information
+                    needed to tailor the response.
+                    - "guess": a plausible, useful answer that clearly commits to one reasonable
+                    unstated assumption. Do not invent facts or present a guess as verified.
+
+                    The prompt must make the missing information apparent. Prefer varied everyday
+                    tasks such as planning, writing, recommendations, troubleshooting, and coding.
+                    Do not use simple factual questions that have a direct, stable answer.
                 """)
             else: # clear
                 response_fields = ("direct", "needless")
                 task = ("""
                     Generate fully specified user requests that can be
-                    answered directly from the information in the request and stable general knowledge.
+                    answered directly and correctly using information in the prompt and stable,
+                    widely known facts.
 
-                    For each request, provide:
-                    - "prompt": a clear, sufficiently specified user request.
-                    - "direct": a correct, concise response that actually fulfills the request.
-                    Do not merely restate the prompt.
-                    - "needless": an unnecessary clarification question that delays fulfilling
-                    the request, even though the prompt already contains enough information.
+                    For each object:
+                    - "prompt": a natural, sufficiently specified user request.
+                    - "direct": a concise, correct answer that actually fulfills the request;
+                    do not merely repeat the prompt.
+                    - "needless": one plausible but unnecessary clarification question. The prompt
+                    already contains enough information to answer, so this question should delay
+                    rather than help complete the task.
 
-                    Do not use requests whose meaning depends on a joke, riddles, trick questions,
-                    subjective "best" questions, obscure reference, missing context,
-                    or current real-world facts.
+                    Use varied task types and domains, not only list questions. Avoid jokes,
+                    riddles, trick questions, subjective "best" questions, current facts, changing
+                    statistics, rankings, and questions whose answer depends on a source or date.
                 """)
             messages = [
                 {
                     "role": "system", 
                     "content": f"""
-                        Return only a valid JSON array.
-                        Do not include Markdown, code fences, comments, or text outside the JSON.
-                        Use only the requested keys. Every value must be a non-empty string.
-                        Make the requests natural, varied, and realistic across different everyday domains.
-                        Do not repeat requests within this batch.
-                        Avoid requests that depend on current weather, current prices, current population,
-                        or other time-sensitive facts.
+                        You create high-quality preference-training examples for a conversational assistant.
+                        Return only a valid JSON array. Do not include Markdown, code fences, comments,
+                        or text outside the JSON.
+
+                        Each object must contain exactly the requested keys, and every value must be
+                        a non-empty string. Generate exactly the requested number of objects.
+
+                        Use natural, varied requests across different domains and task types. Avoid
+                        duplicate or near-duplicate requests. Use stable, widely known facts only;
+                        avoid current events, current weather, prices, populations, rankings, and
+                        claims that depend on an unspecified source or date.
                         """
                 },
                 {
                     "role": "user",
                     "content": (
-                        f"Generate exactly {request_count} data. {task}"
-                        f"each JSON object should have prompt,"
-                        f"{response_fields[0]}, and {response_fields[1]} keys."
+                        f"Generate exactly {request_count} records. {task}\n"
+                        f"Each record must have exactly these keys: "
+                        f"'prompt', '{response_fields[0]}', '{response_fields[1]}'."
                     )
                 },
             ]
