@@ -77,18 +77,18 @@ def synthesize_pairs(n: int) -> list[dict]:
     
     # load model
     model_id = "meta-llama/Llama-3.1-8B-Instruct"
-    print(f"Loading tokenizer: {model_id}", flush=True)
+    # print(f"Loading tokenizer: {model_id}", flush=True)
     tokenizer = AutoTokenizer.from_pretrained(model_id)
-    print("Tokenizer loaded.", flush=True)
+    # print("Tokenizer loaded.", flush=True)
     
-    print("Loading model; this may take a while...", flush=True)
+    # print("Loading model; this may take a while...", flush=True)
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         device_map="auto",
         torch_dtype=torch.bfloat16,
         )
     model.eval()
-    print("Model loaded.", flush=True)
+    # print("Model loaded.", flush=True)
     
     #start generating data
     pairs = []
@@ -141,10 +141,10 @@ def synthesize_pairs(n: int) -> list[dict]:
                 )
             inputs = tokenizer(text, return_tensors="pt").to(model.device)
             
-            print(
-                f"[{class_name}] Generating {request_count} record(s)...",
-                flush=True,
-            )
+            # print(
+            #     f"[{class_name}] Generating {request_count} record(s)...",
+            #     flush=True,
+            # )
             
             with torch.inference_mode():
                 outputs = model.generate(
@@ -155,12 +155,12 @@ def synthesize_pairs(n: int) -> list[dict]:
                     top_p=0.9,
                     )
                 
-            print(f"[{class_name}] Generation finished.", flush=True)    
+            # print(f"[{class_name}] Generation finished.", flush=True)    
                 
             new_tokens = outputs[0][inputs["input_ids"].shape[1]:]
             generated_text = tokenizer.decode(new_tokens, skip_special_tokens=True)
-            print(generated_text, flush=True)
-            print(f"[{class_name}] Decoded output.", flush=True)
+            # print(generated_text, flush=True)
+            # print(f"[{class_name}] Decoded output.", flush=True)
             
             # check the response and turn into pairs with chosen/rejected
             valid_records = []

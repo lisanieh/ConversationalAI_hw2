@@ -19,4 +19,17 @@ export HF_HUB_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 
 cd "$SLURM_SUBMIT_DIR"
-python -u -c "from generate_preference_data import synthesize_pairs; pairs = synthesize_pairs(2); print('count:', len(pairs)); print(pairs)"
+
+python -u - <<'PY'
+import contextlib
+import io
+import json
+
+from generate_preference_data import synthesize_pairs
+
+with contextlib.redirect_stdout(io.StringIO()):
+    pairs = synthesize_pairs(2)
+
+for pair in pairs:
+    print(json.dumps(pair, ensure_ascii=False))
+PY
