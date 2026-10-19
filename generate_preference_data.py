@@ -119,6 +119,11 @@ def synthesize_pairs(n: int) -> list[dict]:
                     needed to tailor the response.
                     - "guess": a plausible, useful answer that clearly commits to one reasonable
                     unstated assumption. Do not invent facts or present a guess as verified.
+                    
+                    Only generate prompts where an important missing detail prevents a useful,
+                    tailored answer. The clarifying question must ask for that essential detail,
+                    not an optional preference. The guessed response must state a reasonable assumption
+                    and must not invent factual claims.
 
                     The prompt must make the missing information apparent. Prefer varied everyday
                     tasks such as planning, writing, recommendations, troubleshooting, and coding.
