@@ -73,7 +73,7 @@ def synthesize_pairs(n: int) -> list[dict]:
     
     batch_size = 10
     ambiguous_target = (n + 1) // 2
-    clear_target = n // 2
+    clear_target = n // 2 
     
     # load model
     model_id = "meta-llama/Llama-3.1-8B-Instruct"
@@ -106,27 +106,55 @@ def synthesize_pairs(n: int) -> list[dict]:
             # let LLM create data with request_count requests for class_name
             if class_name == "ambiguous":
                 response_fields = ("clarify", "guess")
-                task = ("""
-                    Generate user request that is underspecified and could be interpreted in multiple ways.
-                    Then provide two responses: one that asks a clarifying question and one that makes a confident guess. 
-                    Format the output as a JSON array, for each JSON object with keys 'prompt', 'clarify', and 'guess'.
+                task = (f"""
+                    Generate genuinely ambiguous user requests.
+                    A request is ambiguous only when important missing information could materially
+                    change the response. Do not use questions that have a straightforward, useful
+                    general answer, or questions that can be answered by stating a reasonable caveat.
+
+                    For each request, provide:
+                    - "prompt": the user's request.
+                    - "clarify": one specific question asking for the missing information needed
+                    before giving a tailored answer.
+                    - "guess": a plausible response that commits to one unstated interpretation.
+                    Make the assumption apparent; do not invent current or time-sensitive facts.
+
+                    Do not make the prompt ambiguous merely because an unneeded detail could be asked.
                 """)
-            else:
+            else: # clear
                 response_fields = ("direct", "needless")
                 task = ("""
-                    Generate user request that is fully specified and clear. 
-                    Then provide two responses: one that answers directly and one that asks a needless clarifying question. 
-                    Format the output as a JSON array, for each JSON object with keys 'prompt', 'direct', and 'needless'.
+                    Generate fully specified user requests that can be
+                    answered directly from the information in the request and stable general knowledge.
+
+                    For each request, provide:
+                    - "prompt": a clear, sufficiently specified user request.
+                    - "direct": a correct, concise response that actually fulfills the request.
+                    Do not merely restate the prompt.
+                    - "needless": an unnecessary clarification question that delays fulfilling
+                    the request, even though the prompt already contains enough information.
+
+                    Do not use requests whose meaning depends on a joke, riddles, trick questions,
+                    subjective "best" questions, obscure reference, missing context,
+                    or current real-world facts.
                 """)
             messages = [
                 {
                     "role": "system", 
-                    "content": "You only generate json arrays, do not generate any other text or markdown."
+                    "content": f"""
+                        Return only a valid JSON array.
+                        Do not include Markdown, code fences, comments, or text outside the JSON.
+                        Use only the requested keys. Every value must be a non-empty string.
+                        Make the requests natural, varied, and realistic across different everyday domains.
+                        Do not repeat requests within this batch.
+                        Avoid requests that depend on current weather, current prices, current population,
+                        or other time-sensitive facts.
+                        """
                 },
                 {
                     "role": "user",
                     "content": (
-                        f"Generate {request_count} data. {task}"
+                        f"Generate exactly {request_count} data. {task}"
                         f"each JSON object should have prompt,"
                         f"{response_fields[0]}, and {response_fields[1]} keys."
                     )
