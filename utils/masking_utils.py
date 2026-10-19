@@ -37,6 +37,41 @@ def tokenize_with_response_mask(messages: list[dict], tokenizer, max_seq_len: in
     starts in the full conversation's tokenization -- everything before that index is
     prompt, everything from it onward (up to the end-of-turn token) is response.
     """
+    if not messages or messages[-1].get("role") != "assistant":
+        raise ValueError("messages must end with an assistant message.")
+    if max_seq_len < 1:
+        raise ValueError("max_seq_len must be a positive integer.")
     
+    # turn all chat into token ID 
+    input_ids = tokenizer.apply_chat_template(
+        messages,
+        tokenize=True,
+        add_generation_prompt=False,
+    )
     
-    raise NotImplementedError("Implement tokenization + response masking.")
+    # except the last message, turn chat into token ID
+    prefix_ids = tokenizer.apply_chat_template(
+        messages[:-1],
+        tokenize=True,
+        add_generation_prompt=True,
+    )
+    
+    # only keep the first max_seq_len tokens
+    input_ids = torch.tensor(input_ids, dtype=torch.long)[:max_seq_len]
+    
+    # find the index where the final assistant response starts
+    response_start = len(prefix_ids) 
+    
+    if response_start >= len(input_ids):
+      raise ValueError("max_seq_len truncates the entire assistant response") 
+    
+    response_mask = torch.zeros_like(input_ids) # initialize a mask of zeros
+    response_mask[response_start:] = 1  # mark the final assistant response tokens with 1s
+    
+    return {
+        "input_ids": input_ids, # the entire chat token ID
+        "attention_mask": torch.ones_like(input_ids),  # all 1s since no padding is needed
+        "response_mask": response_mask, # 1 for the final assistant response tokens, 0 elsewhere
+    }
+
+    # raise NotImplementedError("Implement tokenization + response masking.")
