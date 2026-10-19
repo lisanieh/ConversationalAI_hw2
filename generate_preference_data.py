@@ -159,7 +159,7 @@ def synthesize_pairs(n: int) -> list[dict]:
                 
             new_tokens = outputs[0][inputs["input_ids"].shape[1]:]
             generated_text = tokenizer.decode(new_tokens, skip_special_tokens=True)
-            
+            print(generated_text, flush=True)
             print(f"[{class_name}] Decoded output.", flush=True)
             
             # check the response and turn into pairs with chosen/rejected
