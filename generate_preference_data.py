@@ -71,7 +71,7 @@ def synthesize_pairs(n: int) -> list[dict]:
     if n < 1:
         raise ValueError(f"n must be at least 1")
     
-    batch_size = 2
+    batch_size = 10
     ambiguous_target = (n + 1) // 2
     clear_target = n // 2
     

@@ -28,7 +28,7 @@ import json
 from generate_preference_data import synthesize_pairs
 
 with contextlib.redirect_stdout(io.StringIO()):
-    pairs = synthesize_pairs(2)
+    pairs = synthesize_pairs(20)
 
 for pair in pairs:
     print(json.dumps(pair, ensure_ascii=False))
