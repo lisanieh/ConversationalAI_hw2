@@ -1,0 +1,10 @@
+{"id":"dev_c001","class":"clear","category":"arithmetic","prompt":"What is 18% of 250?"}
+{"id":"dev_c002","class":"clear","category":"unit_conversion","prompt":"Convert 750 milliliters to liters."}
+{"id":"dev_c003","class":"clear","category":"geography","prompt":"What is the capital city of Japan?"}
+{"id":"dev_c004","class":"clear","category":"science","prompt":"At standard atmospheric pressure, what is the boiling point of water in degrees Celsius?"}
+{"id":"dev_c005","class":"clear","category":"vocabulary","prompt":"Give one synonym for the word 'rapid'."}
+{"id":"dev_c006","class":"clear","category":"translation","prompt":"Translate 'Good morning' into Spanish."}
+{"id":"dev_c007","class":"clear","category":"summarization","prompt":"Summarize this sentence in one short phrase: 'The outdoor concert was postponed because heavy rain was expected.'"}
+{"id":"dev_c008","class":"clear","category":"writing","prompt":"Write a polite one-sentence thank-you note to a colleague who covered my shift yesterday."}
+{"id":"dev_c009","class":"clear","category":"sorting","prompt":"List these numbers in ascending order: 8, 3, 10, 1."}
+{"id":"dev_c010","class":"clear","category":"geometry","prompt":"How many sides does a hexagon have?"}
