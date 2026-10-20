@@ -32,6 +32,10 @@ from data_loader import load_dpo_examples
 from utils.model_utils import load_tokenizer, load_base_model
 from utils.masking_utils import tokenize_with_response_mask
 
+import torch.nn.functional as F
+from torch.nn.utils.rnn import pad_sequence
+from torch.utils.data import DataLoader
+
 
 def build_policy_and_tokenizer(sft_checkpoint_dir: str):
     """
@@ -95,13 +99,42 @@ def sequence_log_prob(
     `with model.disable_adapter():` block to get the reference log-probs -- see
     README.md Part B, gotcha #1.
     """
-    raise NotImplementedError("Implement per-sequence response log-prob computation.")
+    # ensure each sequence have at least two tokens(causal language model need to predict the next token)
+    if input_ids.size(1) < 2:
+        raise ValueError("Each input sequence must contain at least two tokens.")
+
+    # Compute logits for the input sequences
+    logits = model(
+        input_ids=input_ids,
+        attention_mask=attention_mask,
+    ).logits
+
+    # Logits at position t predict the token at position t + 1.
+    token_logps = F.log_softmax(logits[:, :-1, :].float(), dim=-1)
+    targets = input_ids[:, 1:]
+
+    # get the log-probabilities of the target tokens
+    token_logps = token_logps.gather(
+        dim=-1,
+        index=targets.unsqueeze(-1),
+    ).squeeze(-1)
+
+    # Mask out the log-probabilities of the response tokens only
+    response_tokens = response_mask[:, 1:].to(token_logps.dtype)
+    response_tokens = response_tokens * attention_mask[:, 1:].to(token_logps.dtype)
+
+    if torch.any(response_tokens.sum(dim=-1) == 0):
+        raise ValueError("At least one sequence has no unmasked response tokens.")
+
+    return (token_logps * response_tokens).sum(dim=-1)    
+    
+    # raise NotImplementedError("Implement per-sequence response log-prob computation.")
 
 
 def dpo_loss(
-    policy_chosen_logps: torch.Tensor,
+    policy_chosen_logps: torch.Tensor, # policy: the score of the chosen response under the policy
     policy_rejected_logps: torch.Tensor,
-    reference_chosen_logps: torch.Tensor,
+    reference_chosen_logps: torch.Tensor, # reference: the score after stopping LoRA adapter
     reference_rejected_logps: torch.Tensor,
     beta: float = DPO_BETA,
 ) -> torch.Tensor:
@@ -116,7 +149,13 @@ def dpo_loss(
     This function's signature must not change. The GTA reference tests exercise it
     directly (tests/test_dpo_loss.py).
     """
-    raise NotImplementedError("Implement the DPO loss.")
+    preference_margin = (
+        (policy_chosen_logps - reference_chosen_logps)
+        - (policy_rejected_logps - reference_rejected_logps)
+    )
+    return -F.logsigmoid(beta * preference_margin).mean()    
+    
+    # raise NotImplementedError("Implement the DPO loss.")
 
 
 def train_loop(policy, tokenizer, dataset, beta: float = DPO_BETA) -> None:
@@ -140,7 +179,143 @@ def train_loop(policy, tokenizer, dataset, beta: float = DPO_BETA) -> None:
     in configs/train_config.py -- yours to tune. `beta` is passed in per run (--beta) so
     the sweep trains a separate adapter for each value.
     """
-    raise NotImplementedError("Implement the Part B DPO training loop.")
+    if len(dataset) == 0:
+        raise ValueError("DPO dataset is empty.")
+    if tokenizer.pad_token_id is None:
+        raise ValueError("Tokenizer must have a pad token for batching.")
+
+    # only do once before training to turn chosen/rejected into tokne ID and attention/response masks
+    def preprocess(example):
+        tokenized = build_dpo_example(
+            example["prompt"],
+            example["chosen"],
+            example["rejected"],
+            tokenizer,
+        )
+        return {key: value.tolist() for key, value in tokenized.items()}
+
+    tokenized_dataset = dataset.map(
+        preprocess,
+        remove_columns=dataset.column_names,
+        desc="Tokenizing DPO examples",
+    )
+
+    # turn different lengths of sequences to the same length by padding, and collate into a batch
+    def collate_fn(features):
+        batch = {}
+
+        for side in ("chosen", "rejected"):
+            batch[side] = {
+                "input_ids": pad_sequence(
+                    [
+                        torch.tensor(item[f"{side}_input_ids"], dtype=torch.long)
+                        for item in features
+                    ],
+                    batch_first=True,
+                    padding_value=tokenizer.pad_token_id,
+                ),
+                "attention_mask": pad_sequence(
+                    [
+                        torch.tensor(item[f"{side}_attention_mask"], dtype=torch.long)
+                        for item in features
+                    ],
+                    batch_first=True,
+                    padding_value=0,
+                ),
+                "response_mask": pad_sequence(
+                    [
+                        torch.tensor(item[f"{side}_response_mask"], dtype=torch.long)
+                        for item in features
+                    ],
+                    batch_first=True,
+                    padding_value=0,
+                ),
+            }
+
+        return batch
+
+    loader = DataLoader(
+        tokenized_dataset,
+        batch_size=DPO_BATCH_SIZE,
+        shuffle=True,
+        collate_fn=collate_fn,
+    )
+
+    trainable_params = [
+        parameter for parameter in policy.parameters() if parameter.requires_grad
+    ]
+    if not trainable_params:
+        raise ValueError("No trainable parameters found; check the policy adapter.")
+
+    optimizer = torch.optim.AdamW(
+        trainable_params,
+        lr=DPO_LEARNING_RATE,
+    )
+    input_device = policy.get_input_embeddings().weight.device
+
+    policy.train()
+    for epoch in range(DPO_EPOCHS):
+        total_loss = 0.0
+
+        for step, batch in enumerate(loader, start=1):
+            chosen = {
+                key: value.to(input_device)
+                for key, value in batch["chosen"].items()
+            }
+            rejected = {
+                key: value.to(input_device)
+                for key, value in batch["rejected"].items()
+            }
+
+            optimizer.zero_grad(set_to_none=True)
+
+            # count gradients for tbe policy, only the assistant's response
+            policy_chosen_logps = sequence_log_prob(policy, **chosen)
+            policy_rejected_logps = sequence_log_prob(policy, **rejected)
+
+            # stop using LoRA, don't count gradients for the reference model
+            with policy.disable_adapter(), torch.no_grad():
+                reference_chosen_logps = sequence_log_prob(policy, **chosen)
+                reference_rejected_logps = sequence_log_prob(policy, **rejected)
+
+            # compare policy to reference
+            loss = dpo_loss(
+                policy_chosen_logps,
+                policy_rejected_logps,
+                reference_chosen_logps,
+                reference_rejected_logps,
+                beta=beta,
+            )
+
+            if not torch.isfinite(loss):
+                raise ValueError(
+                    f"Non-finite DPO loss at beta={beta}, "
+                    f"epoch {epoch + 1}, step {step}."
+                )
+
+            # only update the policy's LoRA adapter, not the frozen reference model
+            loss.backward()
+            optimizer.step()
+
+            total_loss += loss.item()
+            if step % 20 == 0 or step == len(loader):
+                print(
+                    f"Beta {beta} "
+                    f"Epoch {epoch + 1}/{DPO_EPOCHS} "
+                    f"Step {step}/{len(loader)} "
+                    f"Loss {loss.item():.4f}",
+                    flush=True,
+                )
+
+        average_loss = total_loss / len(loader)
+        print(
+            f"Beta {beta} "
+            f"Epoch {epoch + 1}/{DPO_EPOCHS} "
+            f"Average loss {average_loss:.4f}",
+            flush=True,
+        )    
+    
+    # raise NotImplementedError("Implement the Part B DPO training loop.")
 
 
 def main() -> None:

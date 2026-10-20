@@ -21,7 +21,14 @@
 #SBATCH --error=slurm/logs/%x-%A_%a.err
 
 module load anaconda3
-conda activate CAI_A2
+eval "$(conda shell.bash hook)"
+conda activate ~/scratch/conda/envs/CAI_A2
+
+export HF_HOME=/storage/ice1/0/4/lheck6/CS6604_ECE6256/hf_cache
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+
+cd "$SLURM_SUBMIT_DIR"
 
 BETAS=(0.05 0.1 0.5)
 BETA=${BETAS[$SLURM_ARRAY_TASK_ID]}
