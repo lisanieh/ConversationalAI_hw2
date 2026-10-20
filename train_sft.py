@@ -33,6 +33,9 @@ from data_loader import load_sft_examples
 from utils.model_utils import load_tokenizer, load_base_model
 from utils.masking_utils import tokenize_with_response_mask
 
+from torch.utils.data import DataLoader
+from transformers import DataCollatorForSeq2Seq
+
 
 def build_model_and_tokenizer():
     """Loads the base model + tokenizer, and wraps the model with a LoRA adapter."""
@@ -93,7 +96,77 @@ def train_loop(model, tokenizer, dataset) -> None:
     Hyperparameters (SFT_BATCH_SIZE, SFT_EPOCHS, SFT_LEARNING_RATE, SFT_MAX_SEQ_LEN) are
     in configs/train_config.py -- yours to tune, not fixed by this skeleton.
     """
-    raise NotImplementedError("Implement the Part A SFT training loop.")
+    # turn one data into token
+    def preprocess(example):
+        tokenized = build_sft_example(example["messages"], tokenizer)
+        return {key: value.tolist() for key, value in tokenized.items()} # turn tensor to list
+    
+    # tokenize all the data
+    tokenized_dataset = dataset.map(
+        preprocess,
+        remove_columns=dataset.column_names,
+        desc="Tokenizing SFT examples",
+    )
+    
+    # turn token into tensor and collate into batch
+    collator = DataCollatorForSeq2Seq(
+        tokenizer=tokenizer,
+        padding=True,
+        label_pad_token_id=-100,
+        return_tensors="pt",
+    )
+    loader = DataLoader(
+        tokenized_dataset,
+        batch_size=SFT_BATCH_SIZE,
+        shuffle=True,
+        collate_fn=collator,
+    )
+    
+    # set up optimizer and device
+    trainable_params = [param for param in model.parameters() if param.requires_grad]
+    if not trainable_params:
+        raise ValueError("No trainable parameters found; check the LoRA configuration.")
+
+    optimizer = torch.optim.AdamW(
+        trainable_params,
+        lr=SFT_LEARNING_RATE,
+    )
+    input_device = model.get_input_embeddings().weight.device
+
+    # training loop
+    model.train()
+    for epoch in range(SFT_EPOCHS):
+        total_loss = 0.0
+
+        for step, batch in enumerate(loader, start=1):
+            batch = {key: value.to(input_device) for key, value in batch.items()}
+
+            optimizer.zero_grad(set_to_none=True) # clear gradients of previous batch
+            loss = model(**batch).loss # compute loss for current batch
+
+            # check if the loss is valid, if infinite or nan, raise an error
+            if not torch.isfinite(loss):
+                raise ValueError(f"Non-finite SFT loss at epoch {epoch + 1}, step {step}.")
+
+            loss.backward() # compute gradients for current batch
+            optimizer.step() # update model parameters based on gradients
+
+            total_loss += loss.item()
+            if step % 20 == 0 or step == len(loader):
+                print(
+                    f"Epoch {epoch + 1}/{SFT_EPOCHS} "
+                    f"Step {step}/{len(loader)} "
+                    f"Loss {loss.item():.4f}",
+                    flush=True,
+                )
+        average_loss = total_loss / len(loader)
+        print(
+            f"Epoch {epoch + 1}/{SFT_EPOCHS} "
+            f"Average loss {average_loss:.4f}",
+            flush=True,
+        )
+    
+    # raise NotImplementedError("Implement the Part A SFT training loop.")
 
 
 def main() -> None:
