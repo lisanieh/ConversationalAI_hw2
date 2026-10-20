@@ -33,7 +33,7 @@ items = load_ambiguous_set()[:2] + load_clear_set()[:1]
 prompts = [item["prompt"] for item in items]
 tokenizer = load_tokenizer(SFT_CHECKPOINT_DIR)
 
-beta = 0.1
+beta = 0.5
 print(f"Loading DPO beta={beta}...", flush=True)
 model = load_adapter_policy(dpo_checkpoint_dir(beta))
 model.eval()
