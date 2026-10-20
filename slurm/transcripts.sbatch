@@ -22,17 +22,28 @@ export CUDA_LAUNCH_BLOCKING=1
 cd "$SLURM_SUBMIT_DIR"
 
 python -u - <<'PY'
-from configs.paths_config import dpo_checkpoint_dir
+import torch
+
+from configs.paths_config import SFT_CHECKPOINT_DIR, dpo_checkpoint_dir
+from data_loader import load_ambiguous_set, load_clear_set
 from evaluate import generate_responses, load_adapter_policy
+from utils.model_utils import load_tokenizer
+
+items = load_ambiguous_set()[:2] + load_clear_set()[:1]
+prompts = [item["prompt"] for item in items]
+tokenizer = load_tokenizer(SFT_CHECKPOINT_DIR)
 
 beta = 0.05
+print(f"Loading DPO beta={beta}...", flush=True)
 model = load_adapter_policy(dpo_checkpoint_dir(beta))
 model.eval()
 
-print(f"Loaded DPO beta={beta}", flush=True)
+print("Generating responses...", flush=True)
 responses = generate_responses(model, tokenizer, prompts)
 
 for item, response in zip(items, responses):
     print(f"\n[{item['id']}] {item['prompt']}", flush=True)
     print(f"DPO beta={beta}: {response}", flush=True)
+
+print("DPO transcript test passed.", flush=True)
 PY
