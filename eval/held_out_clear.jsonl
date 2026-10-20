@@ -8,3 +8,43 @@
 {"id":"dev_c008","class":"clear","category":"writing","prompt":"Write a polite one-sentence thank-you note to a colleague who covered my shift yesterday."}
 {"id":"dev_c009","class":"clear","category":"sorting","prompt":"List these numbers in ascending order: 8, 3, 10, 1."}
 {"id":"dev_c010","class":"clear","category":"geometry","prompt":"How many sides does a hexagon have?"}
+{"id":"dev_c011","class":"clear","category":"arithmetic","prompt":"What is 36 + 47?"}
+{"id":"dev_c012","class":"clear","category":"arithmetic","prompt":"What is 15% of 80?"}
+{"id":"dev_c013","class":"clear","category":"arithmetic","prompt":"What is 14 multiplied by 6?"}
+{"id":"dev_c014","class":"clear","category":"arithmetic","prompt":"What is the remainder when 29 is divided by 5?"}
+{"id":"dev_c015","class":"clear","category":"unit_conversion","prompt":"Convert 350 centimeters to meters."}
+{"id":"dev_c016","class":"clear","category":"unit_conversion","prompt":"Convert 2.4 kilograms to grams."}
+{"id":"dev_c017","class":"clear","category":"unit_conversion","prompt":"How many minutes are in 3 hours?"}
+{"id":"dev_c018","class":"clear","category":"unit_conversion","prompt":"Convert 0 degrees Celsius to degrees Fahrenheit."}
+{"id":"dev_c019","class":"clear","category":"geography","prompt":"What is the capital city of Canada?"}
+{"id":"dev_c020","class":"clear","category":"astronomy","prompt":"Which planet is the largest in our solar system?"}
+{"id":"dev_c021","class":"clear","category":"astronomy","prompt":"Which planet is commonly known as the Red Planet?"}
+{"id":"dev_c022","class":"clear","category":"biology","prompt":"Which cell structure contains most of a eukaryotic cell's genetic material?"}
+{"id":"dev_c023","class":"clear","category":"chemistry","prompt":"What is the chemical formula for water?"}
+{"id":"dev_c024","class":"clear","category":"biology","prompt":"How many bones are typically present in an adult human skeleton?"}
+{"id":"dev_c025","class":"clear","category":"biology","prompt":"Which gas do plants absorb from the atmosphere during photosynthesis?"}
+{"id":"dev_c026","class":"clear","category":"science","prompt":"At standard atmospheric pressure, what is the boiling point of water in degrees Celsius?"}
+{"id":"dev_c027","class":"clear","category":"geometry","prompt":"What is the sum of the interior angles of a triangle, in degrees?"}
+{"id":"dev_c028","class":"clear","category":"geometry","prompt":"What is the area of a rectangle that is 8 centimeters long and 3 centimeters wide?"}
+{"id":"dev_c029","class":"clear","category":"geometry","prompt":"What is the perimeter of a square with side length 7 centimeters?"}
+{"id":"dev_c030","class":"clear","category":"mathematics","prompt":"Is 29 a prime number? Answer yes or no."}
+{"id":"dev_c031","class":"clear","category":"mathematics","prompt":"Write the number 14 in Roman numerals."}
+{"id":"dev_c032","class":"clear","category":"computing","prompt":"What is the binary representation of the decimal number 8?"}
+{"id":"dev_c033","class":"clear","category":"language","prompt":"How many letters are in the English alphabet?"}
+{"id":"dev_c034","class":"clear","category":"grammar","prompt":"What is the past tense of the English verb 'go'?"}
+{"id":"dev_c035","class":"clear","category":"grammar","prompt":"What is the plural form of the English noun 'child'?"}
+{"id":"dev_c036","class":"clear","category":"translation","prompt":"Translate the English word 'apple' into French."}
+{"id":"dev_c037","class":"clear","category":"vocabulary","prompt":"Give one synonym for the English adjective 'tiny'."}
+{"id":"dev_c038","class":"clear","category":"vocabulary","prompt":"Give one antonym for the English adjective 'empty'."}
+{"id":"dev_c039","class":"clear","category":"sorting","prompt":"List these numbers in ascending order: 12, 4, 9, 1."}
+{"id":"dev_c040","class":"clear","category":"text_transformation","prompt":"Reverse the order of the letters in the word 'planet'."}
+{"id":"dev_c041","class":"clear","category":"spelling","prompt":"How many vowels are in the English word 'education'? Count a, e, i, o, and u."}
+{"id":"dev_c042","class":"clear","category":"sorting","prompt":"Put these words in alphabetical order: pear, apple, banana."}
+{"id":"dev_c043","class":"clear","category":"summarization","prompt":"Summarize this sentence in exactly five words: 'The train arrived late because snow covered the tracks.'"}
+{"id":"dev_c044","class":"clear","category":"writing","prompt":"Write one polite sentence thanking a colleague for sharing meeting notes."}
+{"id":"dev_c045","class":"clear","category":"grammar","prompt":"Rewrite this sentence in the past tense: 'She walks to school.'"}
+{"id":"dev_c046","class":"clear","category":"grammar","prompt":"In the sentence 'The bright moon shone,' identify the adjective."}
+{"id":"dev_c047","class":"clear","category":"statistics","prompt":"What is the arithmetic mean of 4, 6, and 8?"}
+{"id":"dev_c048","class":"clear","category":"statistics","prompt":"What is the median of these numbers: 2, 5, and 9?"}
+{"id":"dev_c049","class":"clear","category":"arithmetic","prompt":"What is the largest number in this list: 17, 23, 11, 19?"}
+{"id":"dev_c050","class":"clear","category":"arithmetic","prompt":"What is the smallest number in this list: 17, 23, 11, 19?"}

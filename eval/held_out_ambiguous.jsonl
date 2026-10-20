@@ -8,3 +8,43 @@
 {"id":"dev_a008","class":"ambiguous","category":"art","prompt":"I saw a painting I liked. What is it called?"}
 {"id":"dev_a009","class":"ambiguous","category":"craft","prompt":"I want to crochet a wearable gift, but I’m not sure what pattern to choose. What should I make?"}
 {"id":"dev_a010","class":"ambiguous","category":"clothing","prompt":"I need help choosing a Halloween costume for a party. What should I wear that suits me?"}
+{"id":"dev_a011","class":"ambiguous","category":"career","prompt":"Help me prepare for a job interview."}
+{"id":"dev_a012","class":"ambiguous","category":"meal_planning","prompt":"Create a meal plan for me."}
+{"id":"dev_a013","class":"ambiguous","category":"gift","prompt":"Help me choose a birthday gift for my brother."}
+{"id":"dev_a014","class":"ambiguous","category":"home_organization","prompt":"How should I organize my small apartment?"}
+{"id":"dev_a015","class":"ambiguous","category":"email_writing","prompt":"Can you help me write an email to my manager?"}
+{"id":"dev_a016","class":"ambiguous","category":"fitness","prompt":"What's a good workout plan for me?"}
+{"id":"dev_a017","class":"ambiguous","category":"programming","prompt":"Help me debug my script."}
+{"id":"dev_a018","class":"ambiguous","category":"travel","prompt":"Plan a weekend getaway for me."}
+{"id":"dev_a019","class":"ambiguous","category":"branding","prompt":"I need a logo for my business. What should it look like?"}
+{"id":"dev_a020","class":"ambiguous","category":"language_learning","prompt":"I want to learn a new language. Where should I start?"}
+{"id":"dev_a021","class":"ambiguous","category":"books","prompt":"Suggest a book I might enjoy."}
+{"id":"dev_a022","class":"ambiguous","category":"personal_finance","prompt":"Can you help me make a budget?"}
+{"id":"dev_a023","class":"ambiguous","category":"communication","prompt":"How can I get better at public speaking?"}
+{"id":"dev_a024","class":"ambiguous","category":"education","prompt":"Help me choose a college major."}
+{"id":"dev_a025","class":"ambiguous","category":"cleaning","prompt":"What's the best way to clean my kitchen?"}
+{"id":"dev_a026","class":"ambiguous","category":"pets","prompt":"Can you recommend a pet for my household?"}
+{"id":"dev_a027","class":"ambiguous","category":"housing","prompt":"Help me decide whether I should rent or buy a home."}
+{"id":"dev_a028","class":"ambiguous","category":"studying","prompt":"Create a study schedule for me."}
+{"id":"dev_a029","class":"ambiguous","category":"data_interpretation","prompt":"Can you help me understand this chart?"}
+{"id":"dev_a030","class":"ambiguous","category":"mobile_service","prompt":"Which phone plan should I choose?"}
+{"id":"dev_a031","class":"ambiguous","category":"event_planning","prompt":"Help me plan a community event."}
+{"id":"dev_a032","class":"ambiguous","category":"podcasting","prompt":"Can you suggest a name for my podcast?"}
+{"id":"dev_a033","class":"ambiguous","category":"web_design","prompt":"How should I improve my website?"}
+{"id":"dev_a034","class":"ambiguous","category":"editing","prompt":"Can you make this paragraph clearer?"}
+{"id":"dev_a035","class":"ambiguous","category":"interior_design","prompt":"Help me choose a paint color for my room."}
+{"id":"dev_a036","class":"ambiguous","category":"transportation","prompt":"What's the best way to get to the airport?"}
+{"id":"dev_a037","class":"ambiguous","category":"cooking","prompt":"Can you recommend a recipe for dinner?"}
+{"id":"dev_a038","class":"ambiguous","category":"gardening","prompt":"Help me plan a garden."}
+{"id":"dev_a039","class":"ambiguous","category":"presentations","prompt":"How should I prepare for my presentation?"}
+{"id":"dev_a040","class":"ambiguous","category":"computers","prompt":"Recommend a laptop for school."}
+{"id":"dev_a041","class":"ambiguous","category":"home_decor","prompt":"What size rug would work best in my room?"}
+{"id":"dev_a042","class":"ambiguous","category":"entertainment","prompt":"Help me choose a streaming service."}
+{"id":"dev_a043","class":"ambiguous","category":"home_repair","prompt":"There's a leak under my sink. What should I do?"}
+{"id":"dev_a044","class":"ambiguous","category":"writing","prompt":"Can you help me write a thank-you message?"}
+{"id":"dev_a045","class":"ambiguous","category":"saving_money","prompt":"How can I reduce my monthly expenses?"}
+{"id":"dev_a046","class":"ambiguous","category":"cycling","prompt":"Help me pick a route for a bike ride."}
+{"id":"dev_a047","class":"ambiguous","category":"celebration","prompt":"What's a good way to celebrate our anniversary?"}
+{"id":"dev_a048","class":"ambiguous","category":"workspace","prompt":"Help me decorate my office."}
+{"id":"dev_a049","class":"ambiguous","category":"projects","prompt":"I'd like to start a side project. What should I work on?"}
+{"id":"dev_a050","class":"ambiguous","category":"college_selection","prompt":"How do I choose a college?"}
